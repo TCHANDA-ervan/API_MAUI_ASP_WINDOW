@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AppliMobile.pages.Homepage"
+             Title="QR CODE "
+             Background="white">
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30"
+            VerticalOptions="Center" 
+            HorizontalOptions="FillAndExpand">
+
+            <Image Source="logo3il.png" TranslationY="-0" />
+
+            <Label Text="QR CODE GENERETOR "
+                   Margin="30"
+                   FontSize="20"/>
+
+
+            <Label Text="Entrer votre nom et prenom"
+                   SemanticProperties.HeadingLevel="Level1"
+                   SemanticProperties.Description="Enter Data"
+                   FontSize="18"
+                   HorizontalOptions="FillAndExpand"
+                   Margin="10"/>
+
+            <Frame BorderColor="LightSlateGray" Padding="10,0">
+                <Entry x:Name="InputText"
+                       Text=""
+                       SemanticProperties.HeadingLevel="Level2"
+                   SemanticProperties.Description="Enter Data here ...."
+                   FontSize="18"
+                   HorizontalOptions="FillAndExpand"
+                       Margin="5"/>
+            </Frame>
+            <Button x:Name="GeneratorBtn" 
+                Text="QR CODE " 
+                SemanticProperties.Hint="Generate the QR CODE clik"
+                    Clicked="GenerateBtn_clicked"
+                    HorizontalOptions="FillAndExpand"
+                    Margin="15">
+
+
+            </Button>
+            <Frame BorderColor="LightSlateGray"
+                   BackgroundColor="White"
+                   Padding="16">
+                <Image x:Name="QrCodeImage"
+                       HeightRequest="200"
+                       WidthRequest="200"/>
+            </Frame>
+                
+
+            <Button x:Name="btnExit" 
+                Text="EXIT" 
+                BackgroundColor="Transparent"
+                TextColor="Red"
+                BorderWidth="1"
+                BorderColor="Red"
+                FontSize="Large"
+                TranslationY="130">
+
+
+            </Button>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
