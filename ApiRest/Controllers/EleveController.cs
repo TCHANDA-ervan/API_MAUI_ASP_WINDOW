@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Text;
 using ApiRest.Models;
 using Microsoft.EntityFrameworkCore;
+using ApiRest.Helpers;
 
 namespace ApiRest.Controllers
 {
@@ -72,9 +73,9 @@ namespace ApiRest.Controllers
             // if (!string.IsNullOrEmpty(passMessage))
             //   return BadRequest(new { Message = passMessage.ToString() });
 
-            // userObj.Password = PasswordHasher.HashPassword(userObj.Password);
-            // userObj.Role = "User";
-            // userObj.Token = "";
+             userObj.Password = PasswordHasher.HashPassword(userObj.Password);
+            userObj.Role = "Etudiant";
+            userObj.Token = "";
             await _authContext.AddAsync(userObj);
             await _authContext.SaveChangesAsync();
             /* return Ok(new
@@ -200,15 +201,24 @@ namespace ApiRest.Controllers
         [HttpGet("{email}/{password}")] // Endpoint pour la connexion
         public async Task<ActionResult<Eleve>> Login(string email, string password)
         {
-            if (email is not null && password is not null)
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
-                var eleve = await _authContext.Eleves.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.Password == password);
-
-                if (eleve != null)
-                    return Ok(eleve); // Retourne l'objet Eleve si la connexion réussit
+                return BadRequest("Email and Password are required");
             }
 
-            return BadRequest("Invalid Request"); // Sinon, retourne une erreur
+            var eleve = await _authContext.Eleves.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
+
+            if (eleve == null)
+            {
+                return BadRequest(new { Message = "Email is Incorrect" });
+            }
+
+            if (!PasswordHasher.VerifyPassword(password, eleve.Password))
+            {
+                return BadRequest(new { Message = "Password is Incorrect" });
+            }
+
+            return Ok(eleve); // Retourne l'objet Eleve si la connexion réussit
         }
     }
 }
