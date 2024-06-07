@@ -5,7 +5,11 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiRest", "ApiRest\ApiRest.csproj", "{CE898255-810F-4171-8844-5DCFDDFE0D82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppliMobile", "AppliMobile\AppliMobile.csproj", "{D6BE4091-A3D2-4419-8FD6-91096A14A1BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppliMobile", "AppliMobile\AppliMobile.csproj", "{D6BE4091-A3D2-4419-8FD6-91096A14A1BA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "webapi", "webapi\webapi.csproj", "{737DE059-788B-414E-9AC7-4E9F257EDCB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsApp", "WindowsApp\WindowsApp.csproj", "{4794FC4E-0C8F-47A7-908C-56B6028E884E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +27,14 @@ Global
 		{D6BE4091-A3D2-4419-8FD6-91096A14A1BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6BE4091-A3D2-4419-8FD6-91096A14A1BA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D6BE4091-A3D2-4419-8FD6-91096A14A1BA}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{737DE059-788B-414E-9AC7-4E9F257EDCB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{737DE059-788B-414E-9AC7-4E9F257EDCB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{737DE059-788B-414E-9AC7-4E9F257EDCB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{737DE059-788B-414E-9AC7-4E9F257EDCB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4794FC4E-0C8F-47A7-908C-56B6028E884E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4794FC4E-0C8F-47A7-908C-56B6028E884E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4794FC4E-0C8F-47A7-908C-56B6028E884E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4794FC4E-0C8F-47A7-908C-56B6028E884E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

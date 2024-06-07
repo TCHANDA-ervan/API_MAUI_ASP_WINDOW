@@ -7,6 +7,10 @@ using System.Text;
 using ApiRest.Models;
 using Microsoft.EntityFrameworkCore;
 using ApiRest.Helpers;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiRest.Controllers
 {
@@ -15,191 +19,86 @@ namespace ApiRest.Controllers
     public class EleveController : ControllerBase
     {
         private readonly AppDbContext _authContext;
-        public EleveController(AppDbContext context)
+        private readonly IConfiguration _configuration;
+
+        public EleveController(AppDbContext context, IConfiguration configuration)
         {
             _authContext = context;
+            _configuration = configuration;
         }
 
-        [HttpPost("authenticate")]
+        [HttpPost("authenticate"),Authorize]
         public async Task<IActionResult> Authenticate([FromBody] Eleve userObj)
         {
             if (userObj == null)
                 return BadRequest();
 
             var eleve = await _authContext.Eleves
-                .FirstOrDefaultAsync(x => x.Email == userObj.Email && x.Password == userObj.Password);
+                .FirstOrDefaultAsync(x => x.Email == userObj.Email);
 
             if (eleve == null)
                 return NotFound(new { Message = "User not found!" });
 
-            //if (!PasswordHasher.VerifyPassword(userObj.Password, user.Password))
-            //{
-            //return BadRequest(new { Message = "Password is Incorrect" });
-            // }
+            if (!BCrypt.Net.BCrypt.Verify(userObj.Password, eleve.Password))
+            {
+                return BadRequest(new { Message = "Password is Incorrect" });
+            }
 
-            /* user.Token = CreateJwt(user);
-             var newAccessToken = user.Token;
-             var newRefreshToken = CreateRefreshToken();
-             user.RefreshToken = newRefreshToken;
-             user.RefreshTokenExpiryTime = DateTime.Now.AddDays(5);
-             await _authContext.SaveChangesAsync();
+            // Uncomment and adjust if you want to return tokens
+            // eleve.Token = CreateJwt(eleve);
+            // var newAccessToken = eleve.Token;
+            // var newRefreshToken = CreateRefreshToken();
+            // eleve.RefreshToken = newRefreshToken;
+            // eleve.RefreshTokenExpiryTime = DateTime.Now.AddDays(5);
+            // await _authContext.SaveChangesAsync();
 
-             return Ok(new TokenApiDto()
-             {
-               AccessToken = newAccessToken,
-               RefreshToken = newRefreshToken
-             });*/
+            // return Ok(new TokenApiDto()
+            // {
+            //     AccessToken = newAccessToken,
+            //     RefreshToken = newRefreshToken
+            // });
+
             return Ok(new
             {
                 Message = "Login Success!"
             });
         }
 
+
         [HttpPost("register")]
-        public async Task<IActionResult> /*AddUser*/RegisterEleve([FromBody] Eleve userObj)
+        public async Task<IActionResult> RegisterEleve([FromBody] Eleve userObj)
         {
             if (userObj == null)
                 return BadRequest();
 
-            // check email
             if (await CheckEmailExistAsync(userObj.Email))
-                return BadRequest(new { Message = "Email Already Exist" });
+                return BadRequest(new { Message = "Email Already Exists" });
 
-            //check INE
             if (await CheckUsernameExistAsync(userObj.INE))
-                return BadRequest(new { Message = "INE Already Exist" });
+                return BadRequest(new { Message = "INE Already Exists" });
 
+            // Uncomment and adjust if you want to check password strength
             // var passMessage = CheckPasswordStrength(userObj.Password);
             // if (!string.IsNullOrEmpty(passMessage))
-            //   return BadRequest(new { Message = passMessage.ToString() });
+            //     return BadRequest(new { Message = passMessage });
 
-             userObj.Password = PasswordHasher.HashPassword(userObj.Password);
+            userObj.Password = BCrypt.Net.BCrypt.HashPassword(userObj.Password);
             userObj.Role = "Etudiant";
             userObj.Token = "";
             await _authContext.AddAsync(userObj);
             await _authContext.SaveChangesAsync();
-            /* return Ok(new
-             {
-               Status = 200,
-               Message = "User Added!"
-             });*/
+
+            var token = CreateToken(userObj);
+
             return Ok(new
             {
-                Message = "Eleve Resgistered!"
+                Message = "Eleve Registered!",
+                Token = token
             });
-
         }
 
-        private Task<bool> CheckEmailExistAsync(string? email)
-            => _authContext.Eleves.AnyAsync(x => x.Email == email);
-
-        private Task<bool> CheckUsernameExistAsync(string? ine)
-            => _authContext.Eleves.AnyAsync(x => x.INE == ine);
-
-        /* private static string CheckPasswordStrength(string pass)
-         {
-             StringBuilder sb = new StringBuilder();
-             if (pass.Length < 9)
-                 sb.Append("Minimum password length should be 8" + Environment.NewLine);
-             if (!(Regex.IsMatch(pass, "[a-z]") && Regex.IsMatch(pass, "[A-Z]") && Regex.IsMatch(pass, "[0-9]")))
-                 sb.Append("Password doit etre aphanumerique" + Environment.NewLine);
-             if (!Regex.IsMatch(pass, "[<,>,@,!,#,$,%,^,&,*,(,),_,+,\\[,\\],{,},?,:,;,|,',\\,.,/,~,`,-,=]"))
-                 sb.Append("Password should contain special charcter" + Environment.NewLine);
-             return sb.ToString();
-         }*/
-
-        /* private string CreateJwt(User user)
-         {
-           var jwtTokenHandler = new JwtSecurityTokenHandler();
-           var key = Encoding.ASCII.GetBytes("veryverysceret.....");
-           var identity = new ClaimsIdentity(new Claim[]
-           {
-                     new Claim(ClaimTypes.Role, user.Role),
-                     new Claim(ClaimTypes.Name,$"{user.Username}")
-           });
-
-           var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
-
-           var tokenDescriptor = new SecurityTokenDescriptor
-           {
-             Subject = identity,
-             Expires = DateTime.Now.AddSeconds(10),
-             SigningCredentials = credentials
-           };
-           var token = jwtTokenHandler.CreateToken(tokenDescriptor);
-           return jwtTokenHandler.WriteToken(token);
-         }
-
-         private string CreateRefreshToken()
-         {
-           var tokenBytes = RandomNumberGenerator.GetBytes(64);
-           var refreshToken = Convert.ToBase64String(tokenBytes);
-
-           var tokenInUser = _authContext.Users
-               .Any(a => a.RefreshToken == refreshToken);
-           if (tokenInUser)
-           {
-             return CreateRefreshToken();
-           }
-           return refreshToken;
-         }
-
-         private ClaimsPrincipal GetPrincipleFromExpiredToken(string token)
-         {
-           var key = Encoding.ASCII.GetBytes("veryverysceret.....");
-           var tokenValidationParameters = new TokenValidationParameters
-           {
-             ValidateAudience = false,
-             ValidateIssuer = false,
-             ValidateIssuerSigningKey = true,
-             IssuerSigningKey = new SymmetricSecurityKey(key),
-             ValidateLifetime = false
-           };
-           var tokenHandler = new JwtSecurityTokenHandler();
-           SecurityToken securityToken;
-           var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
-           var jwtSecurityToken = securityToken as JwtSecurityToken;
-           if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-             throw new SecurityTokenException("This is Invalid Token");
-           return principal;
-
-         }
-
-         [Authorize]
-         [HttpGet]
-         public async Task<ActionResult<User>> GetAllUsers()
-         {
-           return Ok(await _authContext.Users.ToListAsync());
-         }
-
-         [HttpPost("refresh")]
-         public async Task<IActionResult> Refresh([FromBody] TokenApiDto tokenApiDto)
-         {
-           if (tokenApiDto is null)
-             return BadRequest("Invalid Client Request");
-           string accessToken = tokenApiDto.AccessToken;
-           string refreshToken = tokenApiDto.RefreshToken;
-           var principal = GetPrincipleFromExpiredToken(accessToken);
-           var username = principal.Identity.Name;
-           var user = await _authContext.Users.FirstOrDefaultAsync(u => u.Username == username);
-           if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
-             return BadRequest("Invalid Request");
-           var newAccessToken = CreateJwt(user);
-           var newRefreshToken = CreateRefreshToken();
-           user.RefreshToken = newRefreshToken;
-           await _authContext.SaveChangesAsync();
-           return Ok(new TokenApiDto()
-           {
-             AccessToken = newAccessToken,
-             RefreshToken = newRefreshToken,
-           });
-         }*/
-        [HttpGet] // Endpoint pour récupérer tous les élèves
-        public async Task<ActionResult<List<Eleve>>> Get() => Ok(await _authContext.Eleves.ToListAsync());
-
-
-        [HttpGet("{email}/{password}")] // Endpoint pour la connexion
-        public async Task<ActionResult<Eleve>> Login(string email, string password)
+        [HttpGet("{email}/{password}")]
+        public async Task<ActionResult> Login(string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
@@ -210,16 +109,206 @@ namespace ApiRest.Controllers
 
             if (eleve == null)
             {
-                return BadRequest(new { Message = "Email is Incorrect" });
+                // Optionnel: Log l'erreur pour un suivi côté serveur
+                // Log.Warning("Tentative de connexion avec un e-mail incorrect: {Email}", email);
+                return BadRequest(new { Message = "Email or Password is Incorrect" }); // Ne précise pas si c'est l'email ou le mot de passe
             }
 
-            if (!PasswordHasher.VerifyPassword(password, eleve.Password))
+            if (!BCrypt.Net.BCrypt.Verify(password, eleve.Password))
             {
-                return BadRequest(new { Message = "Password is Incorrect" });
+                // Optionnel: Log l'erreur pour un suivi côté serveur
+                // Log.Warning("Tentative de connexion avec un mot de passe incorrect pour l'e-mail: {Email}", email);
+                return BadRequest(new { Message = "Email or Password is Incorrect" }); // Ne précise pas si c'est l'email ou le mot de passe
             }
 
-            return Ok(eleve); // Retourne l'objet Eleve si la connexion réussit
+            var token = CreateToken(eleve);
+
+            return Ok(new
+            {
+                Message = "Login Successful!",
+                Token = token
+            });
+        }
+
+        private string CreateToken(Eleve eleve)
+        {
+            List<Claim> claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, eleve.Nom),
+            new Claim("Prenom", eleve.Prenom),
+            new Claim("Telephone", eleve.Telephone),
+            new Claim("INE", eleve.INE),
+            new Claim(ClaimTypes.Email, eleve.Email),
+            new Claim(ClaimTypes.Role, eleve.Role)
+        };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value!));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds
+            );
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
+        }
+
+        private async Task<bool> CheckEmailExistAsync(string email)
+        {
+            return await _authContext.Eleves.AnyAsync(e => e.Email == email);
+        }
+
+        private async Task<bool> CheckUsernameExistAsync(string ine)
+        {
+            return await _authContext.Eleves.AnyAsync(e => e.INE == ine);
+        }
+
+        // GET: api/Eleves
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Eleve>>> Geteleve()
+        {
+            var eleves = await _authContext.Eleves
+                           .Include(e => e.Groupe)
+                           .Include(e => e.Promotion)
+                            .ToListAsync();
+
+            if (eleves == null)
+            {
+                return NotFound();
+            }
+
+            return eleves;
+        }
+
+        [HttpPost("register2"),Authorize]
+        public async Task<IActionResult> Register1Eleve([FromBody] Eleve userObj)
+        {
+            if (userObj == null)
+                return BadRequest();
+
+            if (await CheckEmailExistAsync(userObj.Email))
+                return BadRequest(new { Message = "Email Already Exists" });
+
+            if (await CheckUsernameExistAsync(userObj.INE))
+                return BadRequest(new { Message = "INE Already Exists" });
+
+            // Uncomment and adjust if you want to check password strength
+            // var passMessage = CheckPasswordStrength(userObj.Password);
+            // if (!string.IsNullOrEmpty(passMessage))
+            //     return BadRequest(new { Message = passMessage });
+
+            userObj.Password = BCrypt.Net.BCrypt.HashPassword(userObj.Password);
+            userObj.Role = "Etudiant";
+            userObj.Token = "";
+            await _authContext.AddAsync(userObj);
+            await _authContext.SaveChangesAsync();
+
+            var token = CreateToken(userObj);
+
+            return Ok(new
+            {
+                Message = "Eleve Registered!",
+                Token = token
+            });
+        }
+        [HttpGet("geteleves"),Authorize]
+        public async Task<ActionResult<IEnumerable<Eleve>>> Geteleves()
+        {
+            var eleves = await _authContext.Eleves
+                           .Include(e => e.Groupe)
+                           .Include(e => e.Promotion)
+                            .ToListAsync();
+
+            if (eleves == null)
+            {
+                return NotFound();
+            }
+
+            return eleves;
+        }
+
+        // GET: api/Eleves/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Eleve>> GetEleve(int id)
+        {
+            if (_authContext.Eleves == null)
+            {
+                return NotFound();
+            }
+            var eleve = await _authContext.Eleves.FindAsync(id);
+
+            if (eleve == null)
+            {
+                return NotFound();
+            }
+
+            return eleve;
+        }
+
+        // PUT: api/Eleves/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutEleve(int id, Eleve eleve)
+        {
+            if (id != eleve.Id)
+            {
+                return BadRequest();
+            }
+
+            _authContext.Entry(eleve).State = EntityState.Modified;
+
+            try
+            {
+                await _authContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EleveExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+
+        // DELETE: api/Eleves/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEleve(int id)
+        {
+            if (_authContext.Eleves == null)
+            {
+                return NotFound();
+            }
+            var eleve = await _authContext.Eleves.FindAsync(id);
+            if (eleve == null)
+            {
+                return NotFound();
+            }
+
+            _authContext.Eleves.Remove(eleve);
+            await _authContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool EleveExists(int id)
+        {
+            return (_authContext.Eleves?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
+
 }
+
+
 

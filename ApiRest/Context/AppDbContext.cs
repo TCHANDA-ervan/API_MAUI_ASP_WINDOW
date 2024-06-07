@@ -14,7 +14,7 @@ namespace ApiRest.Context
         public DbSet<Adminitrateur> Adminitrateurs { get; set; }
         public DbSet<Coordinateur> Coordinateurs { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
-        public DbSet<Groupe> Groupes { get; set; }
+        public DbSet<Groupe> Groupes { get; set; } 
         public DbSet<Presence> Presences { get; set; }
 
         public DbSet<Journee> Journees { get; set; }
