@@ -69,7 +69,7 @@
 			FontSize="Large"
 			CornerRadius="10"
 			BorderWidth="1"
-			TranslationY="30"
+			TranslationY="20"
 			FontAttributes="Bold"
 			Clicked="Login_Cliked">
 
