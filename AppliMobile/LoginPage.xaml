@@ -61,7 +61,7 @@
                     <Label Text="se souvenir de moi " TextColor="DarkGray" FontSize="Small" VerticalTextAlignment="Center" HorizontalOptions="Center"/>
                     <Label Text="mot de passe oublié " TextColor="Black" FontAttributes="Bold" VerticalTextAlignment="Center" HorizontalOptions="EndAndExpand" HorizontalTextAlignment="Center"/>
                 </StackLayout>
-                <Button x:Name="btnLogin"
+            <Button x:Name="btnLogin"
 			Text="Login"
 			BackgroundColor="Transparent"
 			TextColor="#154360"
@@ -71,14 +71,8 @@
 			BorderWidth="1"
 			TranslationY="20"
 			FontAttributes="Bold"
-			Clicked="Login_Cliked">
-
-
-                </Button>
-
-
-
-
+			Clicked="Login_Cliked"/>
+                
             </StackLayout>
 
         </Grid>
