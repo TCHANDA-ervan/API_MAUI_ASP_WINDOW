@@ -172,17 +172,13 @@ namespace ApiRest.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Eleve>>> Geteleve()
         {
-            var eleves = await _authContext.Eleves
-                           .Include(e => e.Groupe)
-                           .Include(e => e.Promotion)
-                            .ToListAsync();
 
-            if (eleves == null)
+
+            if (_authContext.Groupes == null)
             {
                 return NotFound();
             }
-
-            return eleves;
+            return await _authContext.Eleves.ToListAsync();
         }
 
         [HttpPost("register2"),Authorize]
@@ -219,17 +215,13 @@ namespace ApiRest.Controllers
         [HttpGet("geteleves"),Authorize]
         public async Task<ActionResult<IEnumerable<Eleve>>> Geteleves()
         {
-            var eleves = await _authContext.Eleves
-                           .Include(e => e.Groupe)
-                           .Include(e => e.Promotion)
-                            .ToListAsync();
 
-            if (eleves == null)
+
+            if (_authContext.Groupes == null)
             {
                 return NotFound();
             }
-
-            return eleves;
+            return await _authContext.Eleves.ToListAsync();
         }
 
         // GET: api/Eleves/5

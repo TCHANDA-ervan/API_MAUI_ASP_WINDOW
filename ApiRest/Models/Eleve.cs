@@ -23,11 +23,11 @@ namespace ApiRest.Models
 
         [ForeignKey("Promotion")]
         public int IdPromotion { get; set; }
-        public Promotion Promotion { get; set; }
+       // public Promotion Promotion { get; set; }
         
         [ForeignKey("Groupe")]
         public int IdGroupe { get; set; }
-        public Groupe Groupe { get; set; }
+     //   public Groupe Groupe { get; set; }
        
     }
 }

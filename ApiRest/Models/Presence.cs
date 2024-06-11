@@ -12,6 +12,7 @@ namespace ApiRest.Models
 
         [ForeignKey("Eleve")]
         public int IdEleve { get; set; }
+      //  public Eleve Eleve { get; set; }
 
     }
 }
