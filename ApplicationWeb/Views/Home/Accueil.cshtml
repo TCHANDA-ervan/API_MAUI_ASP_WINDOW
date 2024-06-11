@@ -1,0 +1,132 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+﻿
+@using System.Data
+@using ApiRest.Models;
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Image dans l'en-tête -->
+        <div class="col-md-5 text-center">
+            <img src="~/Images/logo3il.png" alt="3IL" class="img-fluid" />
+        </div>
+    </div>
+
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <!-- Colonne pour les boutons -->
+            <div class="col-md-4 text-center d-flex flex-column">
+                <h3>Liste des etudiants </h3>
+                <a class="btn btn-primary btn-lg mb-2" href="@Url.Action("Nouveau")">
+                    <i class="fas fa-arrow-right"></i> Tous les Etudiants
+                </a>
+                <a class="btn btn-success btn-lg mb-2" href="@Url.Action("Index")">
+                    <i class="fas fa-arrow-right"></i> MS2D
+                </a>
+
+                <a class="btn btn-success btn-lg mb-2" href="@Url.Action("ERIS")">
+                    <i class="fas fa-arrow-right"></i> ERIS
+                </a>
+
+                <a class="btn btn-success btn-lg" href="@Url.Action("ING")">
+                    <i class="fas fa-arrow-right"></i> INGENIEURS
+                </a>
+            </div>
+
+            <!-- Image en haut -->
+            <div class="col-md-4 offset-md-3  text-center">
+                <img src="~/Images/everything.png" alt="Image robot" class="img-fluid" />
+            </div>
+        </div>
+        <!-- Colonne pour les boutons -->
+        <!-- Image à droite -->
+        <!-- Contenu principal -->
+        <div class="col-md-8">
+            <h3 class="text-center">
+                Informatique | Numérique
+                (Re)construire le monde
+                de demain !
+            </h3>
+            <!-- Votre contenu principal ici -->
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*@{
+    var ListeClasse = ViewData["Eleves"] as List<Eleve>;
+}*@
+
+
+@*<header>
+    <img src="~/images/log.png" alt="Logo" />
+</header>
+*@
+@*<h1>Bienvenue </h1>*@
+
+
+@*<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayName("Nom")</th>
+            <th>@Html.DisplayName("Prenom")</th>
+            <th>@Html.DisplayName("EMail")</th>
+            <th>@Html.DisplayName("Phone")</th>
+            <th>@Html.DisplayName("Promotion")</th>
+            <th>@Html.DisplayName("Niveau")</th>
+            <th>@Html.DisplayName("Année")</th>
+            <th>@Html.DisplayName("Groupe")</th>
+            <th>@Html.DisplayName("Formation")</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Eleve row in ListeClasse)
+        {
+            <tr>
+                <td>@row.Nom</td>
+                <td>@row.Prenom</td>
+                <td>@row.EMail</td>
+                <td>@row.Phone </td>
+              @*  <td>@row.Promotion.Nom</td>
+                <td>@row.Promotion.Niveau</td>
+                <td>@row.Promotion.Annee</td>
+                <td>@row.Groupe.Nom</td>
+                <td>@row.Groupe.Formation</td>*@
+@*<td>
+                    <a class="btn btn-primary" href="@Url.Action("Index")">MS2D</a>
+                </td>
+
+<td>
+    <a class="btn btn-primary" href="@Url.Action("ERIS")">ERIS</a>
+</td>
+
+<td>
+    <a class="btn btn-primary" href="@Url.Action("ING")">INGENIEURS</a>
+</td>*@
+@*</tr>
+        }
+    </tbody>
+</table>*@
+
+

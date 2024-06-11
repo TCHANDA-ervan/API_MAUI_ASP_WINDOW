@@ -1,0 +1,132 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@using System.Data
+@using ApiRest.Models
+@using Microsoft.IdentityModel.Tokens
+@model DataTable
+
+@{
+    var ListeEleve = ViewData["Eleve"] as List<Eleve>;
+    var ListePromotions = ViewData["Promotion"] as List<Promotion>;
+    var ListeGroupes = ViewData["Groupe"] as List<Groupe>;
+    var ListePresences = ViewData["Presence"] as List<Presence>;
+    var ListeJournees = ViewData["Journee"] as List<Journee>;
+}
+
+<div class="text-center">
+    <h1>Etudiants MS2D</h1>
+</div>
+
+<div class="container">
+    <input type="text" id="searchBar" placeholder="Rechercher par nom ou prénom...">
+    <button id="searchButton">Rechercher</button>
+
+    <table class="table">
+
+        <!-- Entête du tableau -->
+        <thead>
+            <tr>
+                <th>@Html.DisplayName("Nom")</th>
+                <th>@Html.DisplayName("Prénom")</th>
+                <th>@Html.DisplayName("E-Mail")</th>
+                <th>@Html.DisplayName("Téléphone")</th>
+                <th>@Html.DisplayName("Groupe")</th>
+                <th>@Html.DisplayName("Formation")</th>
+                <th>@Html.DisplayName("Niveau")</th>
+                <th>@Html.DisplayName("Promotion")</th>
+                <th>@Html.DisplayName("Année")</th>
+                <th>@Html.DisplayName("HeureScan")</th>
+                <th>@Html.DisplayName("Statut")</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Boucle sur les données -->
+            @foreach (Eleve row in ListeEleve)
+            {
+                @foreach (Groupe gr in ListeGroupes)
+                {
+                    @foreach (Promotion pr in ListePromotions)
+                    {
+                        @foreach (Presence pre in ListePresences)
+                        {
+                            @* @foreach (Journee jou in ListeJournees)
+            {*@
+                            @if (row.IdGroupe == gr.Id && row.IdPromotion == pr.Id && pre.IdEleve == row.Id && pr.Id == 1 && (gr.Id == 1 || gr.Id == 5))
+                            {
+                                <tr>
+                                    <td>@row.Nom</td>
+                                    <td>@row.Prenom</td>
+                                    <td>@row.Email</td>
+                                    <td>@row.Telephone</td>
+                                    <td>@gr.Nom</td>
+                                    <td>@gr.Formation</td>
+                                    <td>@pr.Niveau</td>
+                                    <td>@pr.Nom</td>
+                                    <td>@pr.Annee</td>
+                                    <td>@pre.Heurescan</td>
+                                    <td>
+                                         @{
+                var backgroundColor = "";
+                var statut = "Absent"; // Par défaut
+
+                if (pre.Heurescan != DateTime.MinValue) // Vérifie si Heurescan a une valeur valide
+                {
+                    if (pre.Heurescan.TimeOfDay >= new TimeSpan(6, 0, 0) && pre.Heurescan.TimeOfDay <= new TimeSpan(8, 30, 0))
+                    {
+                        backgroundColor = "green";
+                        statut = "Présent";
+                    }
+                    else if (pre.Heurescan.TimeOfDay >= new TimeSpan(8, 31, 0) && pre.Heurescan.TimeOfDay <= new TimeSpan(16, 0, 0))
+                    {
+                        backgroundColor = "yellow";
+                        statut = "Retard";
+                    }
+                }
+                else
+                {
+                    backgroundColor = "red";
+                }
+            }
+            <div style="background-color: @backgroundColor;">
+                @statut
+            </div>
+                                    </td>
+
+                                    @*<td>@jou.DateMatin</td>*@
+                                </tr>
+                            }
+                            @*}*@
+                        }
+                    }
+                }
+            }
+        </tbody>
+    </table>
+    @*<button id="downloadPdfButton" class="btn btn-primary">Télécharger la page en PDF</button>*@
+</div>
+
+<script>
+    var searchBar = document.getElementById("searchBar");
+    var searchButton = document.getElementById("searchButton");
+
+    searchButton.addEventListener("click", function () {
+        var searchValue = searchBar.value.toLowerCase();
+        var rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach(function (row) {
+            var nom = row.cells[0].innerText.toLowerCase();
+            var prenom = row.cells[1].innerText.toLowerCase();
+            var groupe = row.cells[4].innerText.toLowerCase();
+
+            if (nom.includes(searchValue) || prenom.includes(searchValue) || groupe.includes(searchValue)) {
+                row.style.display = "table-row";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+</script>
+
+
